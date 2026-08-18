@@ -3,5 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/admin-wahat-homos/', 
+  // Relative asset URLs work both on localhost and under the GitHub Pages
+  // project path (/admin-wahat-homos/).
+  base: './',
 })

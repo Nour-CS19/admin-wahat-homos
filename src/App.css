@@ -243,7 +243,7 @@ body {
 .login-page {
   position: relative;
   overflow: hidden;
-  background: #1b100b url('/images.jpg') center / cover no-repeat;
+  background: #1b100b var(--login-background) center / cover no-repeat;
 }
 
 .login-overlay {
