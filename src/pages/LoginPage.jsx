@@ -1,132 +1,97 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/authService';
-import { FiLock, FiMail } from 'react-icons/fi';
+import { FiCoffee, FiEye, FiEyeOff, FiLock, FiMail } from 'react-icons/fi';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-  
+
     try {
       await loginUser(email, password);
       navigate('/');
     } catch (err) {
       setError('Invalid email or password. Please try again.');
-      console.log(err);  // ← هنا تستخدمه فعلاً
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
-    <div 
-      className="min-vh-100 d-flex align-items-center justify-content-center" 
-      style={{ 
-        backgroundColor: '#1a1a1a',
-        backgroundImage: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
-      }}
-    >
-      <div className="container">
+    <div className="login-page min-vh-100 d-flex align-items-center justify-content-center">
+      <div className="login-overlay" />
+      <div className="container position-relative">
         <div className="row justify-content-center">
-          <div className="col-md-5 col-lg-4">
-            <div 
-              className="card bg-dark text-light shadow-lg" 
-              style={{ 
-                border: '2px solid #8B4513',
-                borderRadius: '15px'
-              }}
-            >
-              <div className="card-body p-5">
+          <div className="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
+            <div className="login-card text-light shadow-lg">
+              <div className="card-body p-4 p-md-5">
                 <div className="text-center mb-4">
-                  <div 
-                    className="mb-3"
-                    style={{ 
-                      fontSize: '3rem',
-                      color: '#8B4513'
-                    }}
-                  >
-                    ☕
-                  </div>
-                  <h2 className="mb-2" style={{ fontWeight: 'bold' }}>Admin Login</h2>
-                  <p className="text-secondary">Access your dashboard</p>
+                  <div className="login-logo mb-3"><FiCoffee size={32} /></div>
+                  <p className="login-kicker mb-2">COFFEE MENU</p>
+                  <h2 className="mb-2">Welcome back</h2>
+                  <p className="login-subtitle mb-0">Sign in to manage your cafe dashboard</p>
                 </div>
-                
-                {error && (
-                  <div className="alert alert-danger" role="alert">
-                    {error}
-                  </div>
-                )}
+
+                {error && <div className="alert alert-danger login-alert" role="alert">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label className="form-label">
-                      <FiMail className="me-2" />
-                      Email Address
-                    </label>
-                    <input 
-                      type="email" 
-                      className="form-control form-control-lg"
-                      placeholder="admin@cafe.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <label className="form-label login-label">Email Address</label>
+                    <div className="login-input-wrapper">
+                      <FiMail className="login-input-icon" size={18} />
+                      <input
+                        type="email"
+                        className="form-control form-control-lg login-input"
+                        placeholder="admin@cafe.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
+                        required
+                      />
+                    </div>
                   </div>
-                  
+
                   <div className="mb-4">
-                    <label className="form-label">
-                      <FiLock className="me-2" />
-                      Password
-                    </label>
-                    <input 
-                      type="password" 
-                      className="form-control form-control-lg"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <label className="form-label login-label">Password</label>
+                    <div className="login-input-wrapper">
+                      <FiLock className="login-input-icon" size={18} />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        className="form-control form-control-lg login-input login-password-input"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="login-password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                      </button>
+                    </div>
                   </div>
-                  
-                  <button 
-                    type="submit" 
-                    className="btn btn-lg w-100 mb-3"
-                    style={{ 
-                      backgroundColor: '#8B4513', 
-                      border: 'none', 
-                      color: '#fff',
-                      fontWeight: 'bold'
-                    }}
-                    disabled={loading}
-                  >
+
+                  <button type="submit" className="btn btn-lg w-100 mb-3 login-button" disabled={loading}>
                     {loading ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2"></span>
-                        Logging in...
-                      </>
-                    ) : (
-                      'Login to Dashboard'
-                    )}
+                      <><span className="spinner-border spinner-border-sm me-2" />Logging in...</>
+                    ) : 'Login to Dashboard'}
                   </button>
                 </form>
 
-                <div className="alert alert-info text-center mb-0">
-                  <small>
-                    <strong>Setup Required:</strong><br />
-                    Create admin account in Firebase Authentication
-                  </small>
-                </div>
               </div>
             </div>
           </div>

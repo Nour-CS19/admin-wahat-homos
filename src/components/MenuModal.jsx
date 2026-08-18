@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiX, FiSave } from 'react-icons/fi';
+import { FiX, FiSave, FiUpload, FiImage } from 'react-icons/fi';
 
 function MenuModal({ show, onClose, onSave, editingItem, categories }) {
   const [formData, setFormData] = useState({
@@ -12,6 +12,8 @@ function MenuModal({ show, onClose, onSave, editingItem, categories }) {
   });
 
   const [errors, setErrors] = useState({});
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (editingItem) {
@@ -23,6 +25,8 @@ function MenuModal({ show, onClose, onSave, editingItem, categories }) {
         price: editingItem.price || '',
         category: editingItem.category || ''
       });
+
+      setImagePreview(editingItem.imageUrl || null);
     } else {
       setFormData({
         nameAr: '',
@@ -32,9 +36,37 @@ function MenuModal({ show, onClose, onSave, editingItem, categories }) {
         price: '',
         category: categories.length > 0 ? categories[0].key : ''
       });
+      setImagePreview(null);
     }
+    setImageFile(null);
     setErrors({});
   }, [editingItem, show, categories]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -50,7 +82,7 @@ function MenuModal({ show, onClose, onSave, editingItem, categories }) {
     const newErrors = validate();
     
     if (Object.keys(newErrors).length === 0) {
-      onSave(formData, null); // No image support
+      onSave(formData, imageFile);
       setErrors({});
     } else {
       setErrors(newErrors);
@@ -131,6 +163,58 @@ function MenuModal({ show, onClose, onSave, editingItem, categories }) {
                   placeholder="Espresso with steamed milk"
                 />
               </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Item Image (Optional)</label>
+              <div className="mb-2 d-flex justify-content-center">
+                {imagePreview ? (
+                  <div className="position-relative d-inline-block">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{
+                        width: '150px',
+                        height: '150px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        border: '2px solid #8B4513'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm position-absolute top-0 end-0 m-2"
+                      onClick={removeImage}
+                      style={{ padding: '4px 8px' }}
+                    >
+                      <FiX size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="d-flex align-items-center justify-content-center"
+                    style={{
+                      width: '150px',
+                      height: '150px',
+                      backgroundColor: '#3d3d3d',
+                      borderRadius: '8px',
+                      border: '2px dashed #8B4513'
+                    }}
+                  >
+                    <FiImage size={40} color="#8B4513" />
+                  </div>
+                )}
+              </div>
+              <input
+                type="file"
+                className="form-control"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              <small className="text-secondary d-block mt-1">
+                <FiUpload size={12} className="me-1" />
+                Upload an image (JPG, PNG, max 5MB)
+              </small>
             </div>
 
             {/* Price and Category */}
